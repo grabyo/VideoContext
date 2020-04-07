@@ -360,10 +360,14 @@ class SourceNode extends GraphNode {
         //update the current time
         this._currentTime = currentTime;
 
+        if(this._state === STATE.ended ){
+            clearTexture(this._gl, this._texture);
+            return false;
+        }
+
         //update the state
         if (
             this._state === STATE.waiting ||
-            this._state === STATE.ended ||
             this._state === STATE.error
         )
             return false;
@@ -384,8 +388,7 @@ class SourceNode extends GraphNode {
             this._state = STATE.playing;
         }
 
-        if (currentTime >= this._stopTime) {
-            clearTexture(this._gl, this._texture);
+        if (currentTime > this._stopTime) {
             this._triggerCallbacks("ended");
             this._state = STATE.ended;
         }
