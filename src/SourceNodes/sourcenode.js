@@ -388,7 +388,7 @@ class SourceNode extends GraphNode {
             this._state = STATE.playing;
         }
 
-        if (currentTime > this._stopTime) {
+        if (currentTime >= this._stopTime) {
             this._triggerCallbacks("ended");
             this._state = STATE.ended;
         }
