@@ -8,6 +8,7 @@ global.window = {}; // eslint-disable-line
 let mockGLContext;
 
 const PAUSED_STATE = 3;
+const ENDED_STATE = 4;
 const ELEMENT = { mock: "videoElement" };
 const mockRenderGraph = {};
 
@@ -39,5 +40,25 @@ describe("_update", () => {
 
         // Expect updateTexture to be called after update
         expect(updateTextureSpy.calledOnce).toBeTruthy();
+    });
+
+    test("at the end of the playblack, it should first update _state=ENDED and then call clearTexture()", () => {
+        const clearTextureSpy = sinon.spy(utils, "clearTexture");
+        const currentTime = 3;
+        const node = new SourceNode(ELEMENT, mockGLContext, mockRenderGraph, currentTime);
+        node.startAt(0);
+        node.stopAt(2);
+        
+        // force an update
+        node._update(currentTime);
+
+        // Expect node to have an ended state
+        expect(node.state).toEqual(ENDED_STATE);
+        // Expect clearTexture to not be called at this point
+        expect(clearTextureSpy.calledOnce).toBeFalsy();
+
+        node._update(currentTime + 0.2);
+        // Expect updateTexture to be called after 2nd update
+        expect(clearTextureSpy.calledOnce).toBeTruthy();
     });
 });
